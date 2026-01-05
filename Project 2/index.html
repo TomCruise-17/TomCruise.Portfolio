@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>DEADLINE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="min-h-screen flex justify-center items-start p-6 bg-white text-black">
+    <!-- Bagian Header -->
+<div class="w-full max-w-lg bg-white bg-opacity-90 backdrop-blur p-6 rounded-xl shadow-lg mt-10 z-10">
+    <div class="flex justify-between mb-4 items-center">
+        <h2 class="text-2xl font-bold text-gray-800">📋 Enter Assignment!</h2>
+        <div class="flex gap-2">
+            <a href="profile.html" class="bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-1 rounded shadow transition-all duration-300">
+                👤 Profil
+            </a>
+            <button onclick="animasiLogout()" class="bg-red-500 hover:bg-red-600 text-white text-sm px-3 py-1 rounded shadow transition-all duration-300">
+                🔒 Logout
+            </button>
+        </div>
+    </div>
+    <!-- Section Profil -->
+<div id="profileSection" class="bg-white bg-opacity-90 p-4 rounded-lg shadow mb-4 hidden">
+    <div class="flex justify-between items-center mb-3">
+        <h2 class="text-xl font-bold">👤 Profil</h2>
+        <button onclick="toggleProfileSection()" class="text-gray-500 hover:text-gray-700">
+            ✕
+        </button>
+    </div>
+    <div class="space-y-3">
+        <div>
+            <label class="block text-sm font-medium text-gray-500">Name</label>
+            <p id="profileDisplayName" class="font-semibold">Mario Tom</p>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-500">Email</label>
+            <p id="profileDisplayEmail" class="font-semibold">tomm@gmail.com</p>
+        </div>
+        <button onclick="showPasswordForm()" class="text-blue-500 text-sm hover:underline">
+            🔒 Change Password
+        </button>
+    </div>
+
+    <!-- Form Ubah Password (Awalnya Tersembunyi) -->
+    <form id="passwordForm" class="mt-4 hidden">
+        <div class="mb-2">
+            <input type="password" id="newPassword" placeholder="Password Baru" 
+                    class="w-full px-3 py-2 border rounded-md text-sm">
+        </div>
+        <div class="mb-2">
+            <input type="password" id="confirmPassword" placeholder="Konfirmasi Password" 
+                    class="w-full px-3 py-2 border rounded-md text-sm">
+        </div>
+        <button type="button" onclick="updatePassword()" 
+                class="w-full bg-blue-500 text-white py-1 rounded-md text-sm hover:bg-blue-600">
+            Save Password
+        </button>
+    </form>
+</div>
+
+    <!-- Form Input Tugas -->
+    <div class="flex flex-col gap-3 mb-4">
+        <input type="text" id="taskInput" placeholder="Type the courses/subjects ...." 
+                class="px-4 py-2 rounded-md border border-gray-300 w-full" />
+        <input type="text" id="dosenInput" placeholder="Type the name of the lecturer/teacher..." 
+                class="px-4 py-2 rounded-md border border-gray-300 w-full" />
+        <textarea id="taskNote" placeholder="Type the assignment ..." rows="2" 
+                class="px-4 py-2 rounded-md border border-gray-300 resize-none w-full"></textarea>
+        <input type="file" id="taskImage" accept="image/*" class="text-sm w-full" />
+        <input type="datetime-local" id="taskDeadline" 
+                class="px-4 py-2 rounded-md border border-gray-300 w-full" />
+        <select id="taskRepeat" class="px-4 py-2 rounded-md border border-gray-300 w-full">
+            <option value="">🔁 Not repeated</option>
+            <option value="harian">🔁 Daily</option>
+            <option value="mingguan">🔁 Weekly</option>
+            <option value="bulanan">🔁 Monthly</option>
+        </select>
+        <button id="tombolTambah" onclick="tambahTugas()" 
+                class="bg-green-500 text-white py-2 rounded-md hover:bg-green-600 w-full" disabled>
+            + Add Task
+        </button>
+    </div>
+
+    <!-- Tombol Filter dan Aksi -->
+    <div class="grid grid-cols-3 gap-2 mb-4">
+        <button onclick="setFilter('semua')" class="filter-btn bg-gray-200 text-gray-800 px-3 py-1 rounded-md">
+            All
+        </button>
+        <button onclick="setFilter('belum')" class="filter-btn bg-gray-200 text-gray-800 px-3 py-1 rounded-md">
+            Not Yet
+        </button>
+        <button onclick="setFilter('selesai')" class="filter-btn bg-gray-200 text-gray-800 px-3 py-1 rounded-md">
+            Finished
+        </button>
+    </div>
+    <div class="grid grid-cols-2 gap-2 mb-4">
+        <button id="alarmToggle" onclick="toggleAlarm()" 
+                class="px-4 py-1 rounded-md bg-yellow-400 text-gray-800 hover:bg-yellow-500">
+            🔔 Alarm: ON
+        </button>
+        <button onclick="tampilkanKalender()" 
+                class="px-4 py-1 rounded-md bg-blue-400 text-white hover:bg-blue-500">
+            📅 Calendar
+        </button>
+    </div>
+
+    <!-- Daftar Tugas -->
+    <ul id="taskList" class="space-y-3"></ul>
+</div>
+
+    <!-- Modal Preview -->
+    <div id="previewModal" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50"
+        onclick="this.style.display='none'">
+        <img id="previewImage" class="max-w-[90%] max-h-[90%] rounded-lg" />
+    </div>
+
+    <input type="file" id="editImageInput" accept="image/*" class="hidden" />
+    <audio id="alarmSound" src="alarm.wav" preload="auto"></audio>
+
+    <!-- Efek Portal Logout -->
+    <div id="logoutOverlay" class="fixed inset-0 hidden items-center justify-center z-50 bg-black bg-opacity-50">
+        <p href = "Deadline.html" class="text-white text-xl font-semibold">👋 Logout...</p>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
